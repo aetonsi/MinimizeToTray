@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MinimizeToTray": {
+      "commandName": "Project",
+      "commandLineArgs": "program.exe test1 test2 333"
+    }
+  }
+}
