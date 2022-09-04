@@ -22,6 +22,13 @@ namespace MinimizeToTray
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Skip(1).Count() == 0)
+            {
+                Application.Exit();
+                Environment.Exit(1);
+            }
+
             BeginInvoke(new MethodInvoker(delegate
             {
                 Hide();
@@ -29,7 +36,6 @@ namespace MinimizeToTray
             TextBox.CheckForIllegalCrossThreadCalls = false;
 
 
-            string[] args = Environment.GetCommandLineArgs();
             string program = "cmd.exe";
             string arguments = "/c " + string.Join(" ", args.Skip(1).ToArray()) + " 2>&1";
             textBox1.AppendText(program + " " + arguments + System.Environment.NewLine);
