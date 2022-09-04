@@ -23,7 +23,7 @@ namespace MinimizeToTray
         private void Form1_Load(object sender, EventArgs e)
         {
             string[] args = Environment.GetCommandLineArgs();
-            if (args.Skip(1).Count() == 0)
+            if (!args.Skip(1).Any())
             {
                 Application.Exit();
                 Environment.Exit(1);
