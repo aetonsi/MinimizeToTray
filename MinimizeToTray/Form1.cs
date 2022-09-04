@@ -27,7 +27,7 @@ namespace MinimizeToTray
                 Hide();
             }));
             TextBox.CheckForIllegalCrossThreadCalls = false;
-            
+
 
             string[] args = Environment.GetCommandLineArgs();
             string program = "cmd.exe";
@@ -69,7 +69,7 @@ namespace MinimizeToTray
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardInput = true;
+            // process.StartInfo.RedirectStandardInput = true;
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.UseShellExecute = false;
             process.OutputDataReceived += (sender, args) => textBox1.AppendText(System.Environment.NewLine + (args.Data));
