@@ -127,12 +127,15 @@ namespace MinimizeToTray
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            ///////////////////////////////// CANCEL CLOSING AND SHOW NOTIFICATION /////////////////////////////////
+            ///////////////////////////////// CANCEL CLOSING AND SHOW NOTIFICATION, IF PROCESS HAS NOT EXITED YET /////////////////////////////////
             if (e.CloseReason == CloseReason.UserClosing)
             {
-                Visible = false;
+                if (process != null && !process.HasExited)
+                {
+                    this.Visible = false;
                 e.Cancel = true;
                 notifyIcon1.ShowBalloonTip(5000);
+                } // else exit
             }
         }
 
