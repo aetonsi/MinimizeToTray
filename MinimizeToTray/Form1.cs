@@ -94,6 +94,7 @@ namespace MinimizeToTray
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.UseShellExecute = false;
             process.OutputDataReceived += (sender, args) => textBox1.AppendText(System.Environment.NewLine + (args.Data));
+            process.ErrorDataReceived += (sender, args) => textBox1.AppendText(System.Environment.NewLine + (args.Data));
             process.Exited += (sender, args) =>
             {
                 separator();
@@ -103,7 +104,7 @@ namespace MinimizeToTray
 
             ///////////////////////////////// START PROCESS /////////////////////////////////
             process.Start();
-            // process.BeginErrorReadLine();
+            process.BeginErrorReadLine();
             process.BeginOutputReadLine();
         }
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
