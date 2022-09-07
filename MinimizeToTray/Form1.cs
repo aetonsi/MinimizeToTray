@@ -93,11 +93,11 @@ namespace MinimizeToTray
         }
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
-            StreamWriter myStreamWriter = process.StandardInput;
+            /*StreamWriter myStreamWriter = process.StandardInput;
             myStreamWriter.Write(e.KeyChar);
             e.Handled = true;
             string text = e.KeyChar.ToString().Replace("\r", "\r\n");
-            textBox1.AppendText(text);
+            textBox1.AppendText(text);*/
         }
 
     }
