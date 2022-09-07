@@ -42,19 +42,19 @@ namespace MinimizeToTray
 
         private void separator(string text = "")
         {
-            textBox1.AppendText(System.Environment.NewLine + " =====================" + text + "===================== ");
+            textBox1.AppendText(System.Environment.NewLine + " =====================" + (text == "" ? "" : " " + text + " " ) + "===================== ");
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             ///////////////////////////////// SETUP VARIABLES /////////////////////////////////
-            args = Environment.GetCommandLineArgs();
+            args = Environment.GetCommandLineArgs().Skip(1).ToArray();
             icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             balloonIcon = System.Windows.Forms.ToolTipIcon.Info;
 
 
             ///////////////////////////////// SETUP FORM, CHECK ARGUMENTS /////////////////////////////////
-            if (!args.Skip(1).Any())
+            if (!args.Any())
             {
                 quit(1);
             }
@@ -64,17 +64,17 @@ namespace MinimizeToTray
 
             ///////////////////////////////// SETUP VARIABLES /////////////////////////////////
             string program = "cmd.exe";
-            string arguments = "/c " + string.Join(" ", args.Skip(1).ToArray()) + " 2>&1";
+            string arguments = "/c " + string.Join(" ", args) + " 2>&1";
             textBox1.AppendText(program + " " + arguments + System.Environment.NewLine);
             separator();
 
 
             ///////////////////////////////// SETUP NOTIFY ICON /////////////////////////////////
             notifyIcon1.Icon = icon;
-            notifyIcon1.Text = productInfo() + " - " + Path.GetFileName(args.Skip(1).ToArray()[0]);
+            notifyIcon1.Text = productInfo() + " - " + Path.GetFileName(args[0]);
             notifyIcon1.BalloonTipIcon = balloonIcon;
             notifyIcon1.BalloonTipTitle = productInfo();
-            notifyIcon1.BalloonTipText = "Still running in the tray: " + string.Join(" ", args.Skip(1).ToArray());
+            notifyIcon1.BalloonTipText = "Still running in the tray: " + string.Join(" ", args);
             ContextMenuStrip contextMenu = new ContextMenuStrip();
             contextMenu.Items.Add(program + " " + arguments, null, (s, e) => Clipboard.SetText(program + " " + arguments) );
             contextMenu.Items.Add("---", null, (s, e) => { });
