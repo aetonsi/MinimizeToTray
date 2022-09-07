@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
@@ -14,42 +9,62 @@ namespace MinimizeToTray
 {
     public partial class Form1 : Form
     {
+        public string[] args;
+        public Icon icon;
+        public ToolTipIcon balloonIcon;
         public Process process;
+
         public Form1()
         {
             InitializeComponent();
         }
 
+        private string productInfo()
+        {
+            return Application.ProductName + " v" + Application.ProductVersion;
+        }
+
+        private void quit(int code)
+        {
+            Application.Exit();
+            Environment.Exit(code);
+        }
+
+        private void separator(string text = "")
+        {
+            textBox1.AppendText(System.Environment.NewLine + " =====================" + text + "===================== ");
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
-            string[] args = Environment.GetCommandLineArgs();
+            ///////////////////////////////// SETUP VARIABLES /////////////////////////////////
+            args = Environment.GetCommandLineArgs();
+            icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            balloonIcon = System.Windows.Forms.ToolTipIcon.Info;
+
+
+            ///////////////////////////////// SETUP FORM, CHECK ARGUMENTS /////////////////////////////////
             if (!args.Skip(1).Any())
             {
-                Application.Exit();
-                Environment.Exit(1);
+                quit(1);
             }
-
-            BeginInvoke(new MethodInvoker(delegate
-            {
-                Hide();
-            }));
             TextBox.CheckForIllegalCrossThreadCalls = false;
+            //BeginInvoke(new MethodInvoker(delegate{Hide();}));
 
 
+            ///////////////////////////////// SETUP VARIABLES /////////////////////////////////
             string program = "cmd.exe";
             string arguments = "/c " + string.Join(" ", args.Skip(1).ToArray()) + " 2>&1";
             textBox1.AppendText(program + " " + arguments + System.Environment.NewLine);
-            textBox1.Text += System.Environment.NewLine + ("=================");
+            separator();
 
 
-            notifyIcon1.DoubleClick += (s, e) => Visible = !Visible;
-            notifyIcon1.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-            notifyIcon1.Visible = true;
-            notifyIcon1.Text = Application.ProductName + 
-                " v" + Application.ProductVersion + 
-                " - " + Path.GetFileName(args.Skip(1).ToArray()[0]);
-
-
+            ///////////////////////////////// SETUP NOTIFY ICON /////////////////////////////////
+            notifyIcon1.Icon = icon;
+            notifyIcon1.Text = productInfo() + " - " + Path.GetFileName(args.Skip(1).ToArray()[0]);
+            notifyIcon1.BalloonTipIcon = balloonIcon;
+            notifyIcon1.BalloonTipTitle = productInfo();
+            notifyIcon1.BalloonTipText = "Still running in the tray: " + string.Join(" ", args.Skip(1).ToArray());
             ContextMenuStrip contextMenu = new ContextMenuStrip();
             contextMenu.Items.Add(program + " " + arguments, null, (s, e) => Clipboard.SetText(program + " " + arguments) );
             contextMenu.Items.Add("---", null, (s, e) => { });
@@ -60,12 +75,12 @@ namespace MinimizeToTray
                 {
                     process.Kill(true);
                 }
-                this.Close();
-                Application.Exit();
+                quit(0);
             });
             notifyIcon1.ContextMenuStrip = contextMenu;
-              
 
+
+            ///////////////////////////////// SETUP PROCESS /////////////////////////////////
             process = new Process();
             // Configure the process using the StartInfo properties.
             process.StartInfo.FileName = program;
@@ -81,12 +96,12 @@ namespace MinimizeToTray
             process.OutputDataReceived += (sender, args) => textBox1.AppendText(System.Environment.NewLine + (args.Data));
             process.Exited += (sender, args) =>
             {
-                textBox1.AppendText(System.Environment.NewLine + " ========================================== ");
-                this.Show();
-                notifyIcon1.Visible = false;
+                separator();
+                Visible = true;
             };
 
 
+            ///////////////////////////////// START PROCESS /////////////////////////////////
             process.Start();
             // process.BeginErrorReadLine();
             process.BeginOutputReadLine();
@@ -100,5 +115,33 @@ namespace MinimizeToTray
             textBox1.AppendText(text);*/
         }
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ///////////////////////////////// CANCEL CLOSING AND SHOW NOTIFICATION /////////////////////////////////
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                Visible = false;
+                e.Cancel = true;
+                notifyIcon1.ShowBalloonTip(5000);
+            }
+        }
+
+        private void notifyIcon1_DoubleClick(object sender, EventArgs e)
+        {
+            ///////////////////////////////// TOGGLE VISIBILITY /////////////////////////////////
+            Visible = !Visible;
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            ///////////////////////////////// HIDE ON STARTUP /////////////////////////////////
+            Visible = false;
+        }
+
+        private void notifyIcon1_BalloonTipClicked(object sender, EventArgs e)
+        {
+            ///////////////////////////////// SHOW FORM ON BALLOONTIP CLICK /////////////////////////////////
+            Visible = true;
+        }
     }
 }
