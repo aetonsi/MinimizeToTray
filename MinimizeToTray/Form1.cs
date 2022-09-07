@@ -30,6 +30,16 @@ namespace MinimizeToTray
             Environment.Exit(code);
         }
 
+        private void killProcess()
+        {
+            if (!process.HasExited)
+            {
+                process.CloseMainWindow();
+                process.Close();
+                process.Kill(true);
+            }
+        }
+
         private void separator(string text = "")
         {
             textBox1.AppendText(System.Environment.NewLine + " =====================" + text + "===================== ");
@@ -70,11 +80,9 @@ namespace MinimizeToTray
             contextMenu.Items.Add("---", null, (s, e) => { });
             contextMenu.Items.Add("Show", null, (s, e) => this.Show());
             contextMenu.Items.Add("Hide", null, (s, e) => this.Hide());
+            contextMenu.Items.Add("Stop", null, (s, e) => killProcess());
             contextMenu.Items.Add("Exit", null, (s, e) => {
-                if(!process.HasExited)
-                {
-                    process.Kill(true);
-                }
+                killProcess();
                 quit(0);
             });
             notifyIcon1.ContextMenuStrip = contextMenu;
@@ -106,6 +114,7 @@ namespace MinimizeToTray
             process.Start();
             process.BeginErrorReadLine();
             process.BeginOutputReadLine();
+            timer1.Start();
         }
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -143,6 +152,15 @@ namespace MinimizeToTray
         {
             ///////////////////////////////// SHOW FORM ON BALLOONTIP CLICK /////////////////////////////////
             Visible = true;
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if(process != null)
+            {
+                process.Refresh();
+                bool xxx = process.HasExited; // BUGFIX, .Refresh() doesn't trigger the Exited event, but reading .HasExited does...........
+            }
         }
     }
 }
