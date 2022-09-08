@@ -49,11 +49,11 @@ namespace MinimizeToTray
 
         private void killProcess()
         {
-            if (!process.HasExited)
+            timer1.Stop();
+            if (process != null && !process.HasExited)
             {
                 process.CloseMainWindow();
-                process.Close();
-                process.Kill(true);
+                if(!process.HasExited) process.Kill(true);
             }
         }
 
@@ -154,7 +154,10 @@ namespace MinimizeToTray
                     this.Visible = false;
                     e.Cancel = true;
                     notifyIcon1.ShowBalloonTip(5000);
-                } // else exit
+                } else {
+                    killProcess();
+                    quit(0);
+                }
             }
         }
 
