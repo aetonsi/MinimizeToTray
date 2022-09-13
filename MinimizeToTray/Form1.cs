@@ -68,6 +68,7 @@ namespace MinimizeToTray
             arguments = Environment.GetCommandLineArgs().Skip(1).ToArray();
             if (!arguments.Any()) quit(1);
             requestedProgramPath = arguments[0];
+            requestedProgramPath = Path.GetRelativePath(".", requestedProgramPath);
             requestedProgramArguments = arguments.Skip(1).ToArray();
             icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             balloonIcon = System.Windows.Forms.ToolTipIcon.Info;
