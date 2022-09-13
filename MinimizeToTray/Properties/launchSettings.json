@@ -2,6 +2,15 @@
   "profiles": {
     "MinimizeToTray": {
       "commandName": "Project"
+    },
+    "test\\program.cmd VISIBLE=1 CLOSEWITHOUTTRAY=1": {
+      "commandName": "Project",
+      "commandLineArgs": "test\\program.cmd arg1 arg2 ecc",
+      "environmentVariables": {
+        "MTT_VISIBLE": "1",
+        "MTT_CLOSEWITHOUTTRAY": "1"
+      },
+      "remoteDebugEnabled": false
     }
   }
 }

@@ -12,6 +12,9 @@ namespace MinimizeToTray
 {
     public partial class Form1 : Form
     {
+        public const string ENVVAR_CLOSEWITHOUTTRAY = "MTT_CLOSEWITHOUTTRAY";
+        public const string ENVVAR_VISIBLE = "MTT_VISIBLE";
+        //
         public string[] arguments;
         public string requestedProgramPath;
         public string[] requestedProgramArguments;
@@ -24,6 +27,10 @@ namespace MinimizeToTray
         public Form1()
         {
             InitializeComponent();
+        }
+
+        private bool getEnvVar(string varname) {
+            return Environment.GetEnvironmentVariable(varname) != null;
         }
 
         private string requestedProgramCommandLine(bool alsorequestedProgramArguments = true)
@@ -151,7 +158,7 @@ namespace MinimizeToTray
             ///////////////////////////////// CANCEL CLOSING AND SHOW NOTIFICATION, IF PROCESS HAS NOT EXITED YET /////////////////////////////////
             if (e.CloseReason == CloseReason.UserClosing)
             {
-                if (process != null && !process.HasExited)
+                if (process != null && !process.HasExited && !getEnvVar(ENVVAR_CLOSEWITHOUTTRAY))
                 {
                     this.Visible = false;
                     e.Cancel = true;
@@ -171,8 +178,11 @@ namespace MinimizeToTray
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            ///////////////////////////////// HIDE ON STARTUP /////////////////////////////////
+            ///////////////////////////////// HIDE ON STARTUP, except when envvar is set /////////////////////////////////
+            if(!getEnvVar(ENVVAR_VISIBLE))
+            {
             this.Visible = false;
+        }
         }
 
         private void notifyIcon1_BalloonTipClicked(object sender, EventArgs e)
